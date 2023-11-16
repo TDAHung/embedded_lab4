@@ -31,6 +31,59 @@ void displayTime(){
 	lcd_ShowIntNum(150, 130, ds3231_year, 2, YELLOW, BLACK, 24);
 }
 
+void convert_large_values() {
+    while (clock[SECOND_INDEX] >= 60 || clock[MINUTE_INDEX] >= 60 || clock[HOUR_INDEX] >= 24 || clock[DAY_INDEX] >= 7 || clock[DATE_INDEX] > 31 || clock[MONTH_INDEX] > 12) {
+        if (clock[SECOND_INDEX] >= 60) {
+        	clock[SECOND_INDEX] -= 60;
+        	clock[MINUTE_INDEX]++;
+        }
+
+        if (clock[MINUTE_INDEX] >= 60) {
+        	clock[MINUTE_INDEX] -= 60;
+        	clock[HOUR_INDEX]++;
+        }
+
+        if (clock[HOUR_INDEX] >= 24) {
+        	clock[HOUR_INDEX] -= 24;
+        	clock[DAY_INDEX]++;
+        }
+
+        if (clock[DAY_INDEX] >= 7) {
+        	clock[DAY_INDEX] -= 7;
+        }
+
+        int days_in_month;
+
+        switch (clock[MONTH_INDEX]) {
+            case 1: case 3: case 5: case 7: case 8: case 10: case 12:
+                days_in_month = 31;
+                break;
+            case 4: case 6: case 9: case 11:
+                days_in_month = 30;
+                break;
+            case 2:
+                if ((clock[YEAR_INDEX] % 4 == 0 && clock[YEAR_INDEX] % 100 != 0) || (clock[YEAR_INDEX] % 400 == 0)) {
+                    days_in_month = 29;
+                } else {
+                    days_in_month = 28;
+                }
+                break;
+            default:
+                break;
+        }
+
+        if (clock[DATE_INDEX] > days_in_month) {
+        	clock[DATE_INDEX] -= days_in_month;
+        	clock[MONTH_INDEX]++;
+
+            if (clock[MONTH_INDEX] > 12) {
+            	clock[MONTH_INDEX] -= 12;
+            	clock[YEAR_INDEX]++;
+            }
+        }
+    }
+}
+
 void update_clock() {
 	clock[SECOND_INDEX]++;
 
@@ -90,6 +143,7 @@ void update_clock() {
 void fsm_rtc(){
 	switch(currentStateClock){
 	case INIT:
+		convert_large_values();
 		currentStateClock = SHOW_CLOCK;
 		break;
 	case SHOW_CLOCK:
