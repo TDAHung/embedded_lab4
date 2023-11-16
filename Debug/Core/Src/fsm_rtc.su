@@ -1,0 +1,4 @@
+fsm_rtc.c:14:6:update_time	24	static
+fsm_rtc.c:24:6:displayTime	24	static
+fsm_rtc.c:34:6:update_clock	16	static
+fsm_rtc.c:90:6:fsm_rtc	40	static
