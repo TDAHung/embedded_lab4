@@ -8,6 +8,7 @@
 #include "fsm_rtc.h"
 
 int clock[7] = {0,0,0,1,1,1,1};
+int timerClock[7] = {0,0,0,1,1,1,1};
 
 enum stateRTC currentStateClock = INIT;
 enum stateSpecificationClock currentSpecificationState = SECOND;
@@ -175,63 +176,82 @@ void update_clock() {
     }
 }
 
-void showTime(){
-	update_time(clock[SECOND_INDEX],clock[MINUTE_INDEX],clock[HOUR_INDEX],clock[DAY_INDEX],clock[DATE_INDEX],clock[MONTH_INDEX],clock[YEAR_INDEX]);\
+void showTime(int rtc[7]){
+	update_time(rtc[0],rtc[MINUTE_INDEX],rtc[HOUR_INDEX],rtc[DAY_INDEX],rtc[DATE_INDEX],rtc[MONTH_INDEX],rtc[YEAR_INDEX]);
 	displayTime();
 }
 
 void blinky(int index){
 	if(flag_timer[1]){
-		if(blink){
-			switchTimeAtIndex(index,1);
-			blink = 0;
-		}else{
-			switchTimeAtIndex(index,1);
-			blink = 1;
-		}
+		switchTimeAtIndex(index,blink);
+		if(blink) blink = 0;
+		else blink = 1;
 		setTimer(200,1);
 	}
 }
 
-void fsm_rtc_button_processing(){
+int check_timer_clock(int rtc[7], int timer_clock[7]){
+	if(rtc[SECOND_INDEX] == timer_clock[SECOND_INDEX] &&
+			rtc[MINUTE_INDEX] == timer_clock[MINUTE_INDEX] &&
+			rtc[HOUR_INDEX] == timer_clock[HOUR_INDEX] &&
+			rtc[DAY_INDEX] == timer_clock[DAY_INDEX] &&
+			rtc[DATE_INDEX] == timer_clock[DATE_INDEX] &&
+			rtc[MONTH_INDEX] == timer_clock[MONTH_INDEX] &&
+			rtc[YEAR_INDEX] == timer_clock[YEAR_INDEX] ) return 1;
+	return 0;
+}
+
+void fsm_rtc_button_processing(int rtc[7]){
 	switch(currentSpecificationState){
 	case SECOND:
 		blinky(SECOND);
 		if(button_count[BUTTON_UP]) {
-			if(clock[SECOND_INDEX] == 59) clock[SECOND_INDEX] = 0;
-			clock[SECOND_INDEX]++;
+			if(rtc[SECOND_INDEX] == 59) rtc[SECOND_INDEX] = 0;
+			rtc[SECOND_INDEX]++;
 		}
-		if(button_count[BUTTON_NEXT]) currentSpecificationState = MINUTE;
+		if(button_count[BUTTON_NEXT]) {
+			switchTimeAtIndex(SECOND, 1);
+			currentSpecificationState = MINUTE;
+		}
 		break;
 	case MINUTE:
 		blinky(MINUTE);
 		if(button_count[BUTTON_UP]) {
-			if(clock[MINUTE_INDEX] == 59) clock[MINUTE_INDEX] = 0;
-			clock[MINUTE_INDEX]++;
+			if(rtc[MINUTE_INDEX] == 59) rtc[MINUTE_INDEX] = 0;
+			rtc[MINUTE_INDEX]++;
 		}
-		if(button_count[BUTTON_NEXT]) currentSpecificationState = HOUR;
+		if(button_count[BUTTON_NEXT]) {
+			switchTimeAtIndex(MINUTE, 1);
+			currentSpecificationState = HOUR;
+		}
 		break;
 	case HOUR:
 		blinky(HOUR);
 		if(button_count[BUTTON_UP]) {
-			if(clock[HOUR_INDEX] == 23) clock[HOUR_INDEX] = 0;
-			clock[HOUR_INDEX]++;
+			if(rtc[HOUR_INDEX] == 23) rtc[HOUR_INDEX] = 0;
+			rtc[HOUR_INDEX]++;
 		}
-		if(button_count[BUTTON_NEXT]) currentSpecificationState = DAY;
+		if(button_count[BUTTON_NEXT]) {
+			switchTimeAtIndex(HOUR, 1);
+			currentSpecificationState = DAY;
+		}
 		break;
 	case DAY:
 		blinky(DAY);
 		if(button_count[BUTTON_UP]) {
-			if(clock[DAY_INDEX] == 7) clock[DAY_INDEX] = 1;
-			clock[DAY_INDEX]++;
+			if(rtc[DAY_INDEX] == 7) rtc[DAY_INDEX] = 1;
+			rtc[DAY_INDEX]++;
 		}
-		if(button_count[BUTTON_NEXT]) currentSpecificationState = DATE;
+		if(button_count[BUTTON_NEXT]) {
+			switchTimeAtIndex(DAY, 1);
+			currentSpecificationState = DATE;
+		}
 		break;
 	case DATE:
 		blinky(DATE);
 		if(button_count[BUTTON_UP]) {
 	        int days_in_month;
-	        switch (clock[MONTH_INDEX]) {
+	        switch (rtc[MONTH_INDEX]) {
 	            case 1: case 3: case 5: case 7: case 8: case 10: case 12:
 	                days_in_month = 31;
 	                break;
@@ -239,7 +259,7 @@ void fsm_rtc_button_processing(){
 	                days_in_month = 30;
 	                break;
 	            case 2:
-	                if ((clock[YEAR_INDEX] % 4 == 0 && clock[YEAR_INDEX] % 100 != 0) || (clock[YEAR_INDEX] % 400 == 0)) {
+	                if ((rtc[YEAR_INDEX] % 4 == 0 && rtc[YEAR_INDEX] % 100 != 0) || (rtc[YEAR_INDEX] % 400 == 0)) {
 	                    days_in_month = 29;
 	                } else {
 	                    days_in_month = 28;
@@ -248,25 +268,34 @@ void fsm_rtc_button_processing(){
 	            default:
 	                break;
 	        }
-			if(clock[DATE_INDEX] == days_in_month) clock[DATE_INDEX] = 1;
-			clock[DATE_INDEX]++;
+			if(rtc[DATE_INDEX] == days_in_month) rtc[DATE_INDEX] = 1;
+			rtc[DATE_INDEX]++;
 		}
-		if(button_count[BUTTON_NEXT]) currentSpecificationState = MONTH;
+		if(button_count[BUTTON_NEXT]) {
+			switchTimeAtIndex(DATE, 1);
+			currentSpecificationState = MONTH;
+		}
 		break;
 	case MONTH:
 		blinky(MONTH);
 		if(button_count[BUTTON_UP]) {
-			if(clock[MONTH_INDEX] == 12) clock[MONTH_INDEX] = 1;
-			clock[MONTH_INDEX]++;
+			if(rtc[MONTH_INDEX] == 12) rtc[MONTH_INDEX] = 1;
+			rtc[MONTH_INDEX]++;
 		}
-		if(button_count[BUTTON_NEXT]) currentSpecificationState = YEAR;
+		if(button_count[BUTTON_NEXT]) {
+			switchTimeAtIndex(MONTH, 1);
+			currentSpecificationState = YEAR;
+		}
 		break;
 	case YEAR:
 		blinky(YEAR);
 		if(button_count[BUTTON_UP]) {
-			clock[YEAR_INDEX]++;
+			rtc[YEAR_INDEX]++;
 		}
-		if(button_count[BUTTON_NEXT]) currentSpecificationState = SECOND;
+		if(button_count[BUTTON_NEXT]) {
+			switchTimeAtIndex(YEAR, 1);
+			currentSpecificationState = SECOND;
+		}
 		break;
 	default: break;
 	}
@@ -283,15 +312,21 @@ void fsm_rtc(){
 			update_clock();
 			setTimer(1000, 0);
 		}
-		showTime();
+		if(check_timer_clock(clock,timerClock)){
+			//lcd display reach the timer
+		}
+		showTime(clock);
 		if(button_count[BUTTON_CHANGE]) currentStateClock = MODIFY_CLOCK;
 		break;
 	case MODIFY_CLOCK:
 		currentSpecificationState = SECOND;
-		fsm_rtc_button_processing();
+		fsm_rtc_button_processing(clock);
 		if(button_count[BUTTON_CHANGE]) currentStateClock = TIMER_CLOCK;
 		break;
 	case TIMER_CLOCK:
+		showTime(timerClock);
+		fsm_rtc_button_processing(timerClock);
+		if(button_count[BUTTON_CHANGE]) currentStateClock = SHOW_CLOCK;
 		break;
 	default: break;
 	}
