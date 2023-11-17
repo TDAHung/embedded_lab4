@@ -12,6 +12,7 @@
 #include "ds3231.h"
 #include "software_timer.h"
 #include "lcd.h"
+#include "button.h"
 
 #define SECOND_INDEX 0
 #define MINUTE_INDEX 1
@@ -20,11 +21,25 @@
 #define DATE_INDEX 4
 #define MONTH_INDEX 5
 #define YEAR_INDEX 6
+#define BUTTON_UP 0
+#define BUTTON_CHANGE 1
+#define BUTTON_NEXT 2
 
 enum stateRTC {
 	INIT,
 	SHOW_CLOCK,
-	MODIFY_CLOCK
+	MODIFY_CLOCK,
+	TIMER_CLOCK
+};
+
+enum stateSpecificationClock{
+	SECOND,
+	MINUTE,
+	HOUR,
+	DAY,
+	DATE,
+	MONTH,
+	YEAR
 };
 
 extern int clock[7];

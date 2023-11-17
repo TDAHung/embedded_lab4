@@ -33,7 +33,7 @@ Core/Src/fsm_rtc.o: ../Core/Src/fsm_rtc.c ../Core/Inc/fsm_rtc.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Core/Inc/ds3231.h ../Core/Inc/i2c.h ../Core/Inc/utils.h \
  ../Core/Inc/software_timer.h ../Core/Inc/tim.h ../Core/Inc/lcd.h \
- ../Core/Inc/gpio.h
+ ../Core/Inc/gpio.h ../Core/Inc/button.h ../Core/Inc/spi.h
 
 ../Core/Inc/fsm_rtc.h:
 
@@ -116,3 +116,7 @@ Core/Src/fsm_rtc.o: ../Core/Src/fsm_rtc.c ../Core/Inc/fsm_rtc.h \
 ../Core/Inc/lcd.h:
 
 ../Core/Inc/gpio.h:
+
+../Core/Inc/button.h:
+
+../Core/Inc/spi.h:
