@@ -43,6 +43,7 @@ enum stateSpecificationClock{
 };
 
 extern int clock[7];
+extern int timer_clock[7];
 
 void updateTime(int,int,int,int,int,int,int);
 void displayTime(void);

@@ -316,17 +316,22 @@ void fsm_rtc(){
 			//lcd display reach the timer
 		}
 		showTime(clock);
-		if(button_count[BUTTON_CHANGE]) currentStateClock = MODIFY_CLOCK;
+		if(button_count[BUTTON_CHANGE]) {
+			currentSpecificationState = SECOND;
+			currentStateClock = MODIFY_CLOCK;
+		}
 		break;
 	case MODIFY_CLOCK:
-		currentSpecificationState = SECOND;
 		fsm_rtc_button_processing(clock);
 		if(button_count[BUTTON_CHANGE]) currentStateClock = TIMER_CLOCK;
 		break;
 	case TIMER_CLOCK:
 		showTime(timerClock);
 		fsm_rtc_button_processing(timerClock);
-		if(button_count[BUTTON_CHANGE]) currentStateClock = SHOW_CLOCK;
+		if(button_count[BUTTON_CHANGE]) {
+			currentSpecificationState = SECOND;
+			currentStateClock = SHOW_CLOCK;
+		}
 		break;
 	default: break;
 	}
