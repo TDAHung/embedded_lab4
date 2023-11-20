@@ -47,6 +47,6 @@ extern int timer_clock[7];
 
 void updateTime(int,int,int,int,int,int,int);
 void displayTime(void);
-void fsm_stc(void);
+void fsm_rtc(void);
 
 #endif /* INC_FSM_RTC_H_ */

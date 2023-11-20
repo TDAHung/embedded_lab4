@@ -37,16 +37,16 @@ void displayTime(){
 void switchTimeAtIndex(int index, int is_active){
 	switch(index){
 	case 0:
-		if(is_active) lcd_ShowIntNum(70, 100, ds3231_hours, 2, GREEN, BLACK, 24);
-		else lcd_ShowIntNum(70, 100, ds3231_hours, 2, BLACK, BLACK, 24);
+		if(is_active) lcd_ShowIntNum(150, 100, ds3231_sec, 2, GREEN, BLACK, 24);
+		else lcd_ShowIntNum(150, 100, ds3231_sec, 2, BLACK, BLACK, 24);
 		break;
 	case 1:
 		if(is_active) lcd_ShowIntNum(110, 100, ds3231_min, 2, GREEN, BLACK, 24);
 		else lcd_ShowIntNum(110, 100, ds3231_min, 2, BLACK, BLACK, 24);
 		break;
 	case 2:
-		if(is_active) lcd_ShowIntNum(150, 100, ds3231_sec, 2, GREEN, BLACK, 24);
-		else lcd_ShowIntNum(150, 100, ds3231_sec, 2, BLACK, BLACK, 24);
+		if(is_active) lcd_ShowIntNum(70, 100, ds3231_hours, 2, GREEN, BLACK, 24);
+		else lcd_ShowIntNum(70, 100, ds3231_hours, 2, BLACK, BLACK, 24);
 		break;
 	case 3:
 		if(is_active) lcd_ShowIntNum(20, 130, ds3231_day, 2, YELLOW, BLACK, 24);
@@ -186,7 +186,7 @@ void blinky(int index){
 		switchTimeAtIndex(index,blink);
 		if(blink) blink = 0;
 		else blink = 1;
-		setTimer(200,1);
+		setTimer(500,1);
 	}
 }
 
@@ -202,99 +202,142 @@ int check_timer_clock(int rtc[7], int timer_clock[7]){
 }
 
 void fsm_rtc_button_processing(int rtc[7]){
+
 	switch(currentSpecificationState){
 	case SECOND:
 		blinky(SECOND);
 		if(button_count[BUTTON_UP]) {
-			if(rtc[SECOND_INDEX] == 59) rtc[SECOND_INDEX] = 0;
-			rtc[SECOND_INDEX]++;
+			if(flag_timer[2]){
+				if(rtc[SECOND_INDEX] == 59) rtc[SECOND_INDEX] = 0;
+				rtc[SECOND_INDEX]++;
+				setTimer(250,2);
+			}
 		}
 		if(button_count[BUTTON_NEXT]) {
-			switchTimeAtIndex(SECOND, 1);
-			currentSpecificationState = MINUTE;
+			if(flag_timer[2]){
+				switchTimeAtIndex(SECOND, 1);
+				currentSpecificationState = MINUTE;
+				setTimer(250,2);
+			}
 		}
 		break;
 	case MINUTE:
 		blinky(MINUTE);
 		if(button_count[BUTTON_UP]) {
-			if(rtc[MINUTE_INDEX] == 59) rtc[MINUTE_INDEX] = 0;
-			rtc[MINUTE_INDEX]++;
+			if(flag_timer[2]){
+				if(rtc[MINUTE_INDEX] == 59) rtc[MINUTE_INDEX] = 0;
+				rtc[MINUTE_INDEX]++;
+				setTimer(250,2);
+			}
 		}
 		if(button_count[BUTTON_NEXT]) {
-			switchTimeAtIndex(MINUTE, 1);
-			currentSpecificationState = HOUR;
+			if(flag_timer[2]){
+				switchTimeAtIndex(MINUTE, 1);
+				currentSpecificationState = HOUR;
+				setTimer(250,2);
+			}
 		}
 		break;
 	case HOUR:
 		blinky(HOUR);
 		if(button_count[BUTTON_UP]) {
-			if(rtc[HOUR_INDEX] == 23) rtc[HOUR_INDEX] = 0;
-			rtc[HOUR_INDEX]++;
+			if(flag_timer[2]){
+				if(rtc[HOUR_INDEX] == 23) rtc[HOUR_INDEX] = 0;
+				rtc[HOUR_INDEX]++;
+				setTimer(250,2);
+			}
 		}
 		if(button_count[BUTTON_NEXT]) {
-			switchTimeAtIndex(HOUR, 1);
-			currentSpecificationState = DAY;
+			if(flag_timer[2]){
+				switchTimeAtIndex(HOUR, 1);
+				currentSpecificationState = DAY;
+				setTimer(250,2);
+			}
 		}
 		break;
 	case DAY:
 		blinky(DAY);
 		if(button_count[BUTTON_UP]) {
-			if(rtc[DAY_INDEX] == 7) rtc[DAY_INDEX] = 1;
-			rtc[DAY_INDEX]++;
+			if(flag_timer[2]){
+				if(rtc[DAY_INDEX] == 7) rtc[DAY_INDEX] = 1;
+				rtc[DAY_INDEX]++;
+				setTimer(250,2);
+			}
 		}
 		if(button_count[BUTTON_NEXT]) {
-			switchTimeAtIndex(DAY, 1);
-			currentSpecificationState = DATE;
+			if(flag_timer[2]){
+				switchTimeAtIndex(DAY, 1);
+				currentSpecificationState = DATE;
+				setTimer(250,2);
+			}
 		}
 		break;
 	case DATE:
 		blinky(DATE);
 		if(button_count[BUTTON_UP]) {
-	        int days_in_month;
-	        switch (rtc[MONTH_INDEX]) {
-	            case 1: case 3: case 5: case 7: case 8: case 10: case 12:
-	                days_in_month = 31;
-	                break;
-	            case 4: case 6: case 9: case 11:
-	                days_in_month = 30;
-	                break;
-	            case 2:
-	                if ((rtc[YEAR_INDEX] % 4 == 0 && rtc[YEAR_INDEX] % 100 != 0) || (rtc[YEAR_INDEX] % 400 == 0)) {
-	                    days_in_month = 29;
-	                } else {
-	                    days_in_month = 28;
-	                }
-	                break;
-	            default:
-	                break;
-	        }
-			if(rtc[DATE_INDEX] == days_in_month) rtc[DATE_INDEX] = 1;
-			rtc[DATE_INDEX]++;
+			if(flag_timer[2]){
+		        int days_in_month;
+		        switch (rtc[MONTH_INDEX]) {
+		            case 1: case 3: case 5: case 7: case 8: case 10: case 12:
+		                days_in_month = 31;
+		                break;
+		            case 4: case 6: case 9: case 11:
+		                days_in_month = 30;
+		                break;
+		            case 2:
+		                if ((rtc[YEAR_INDEX] % 4 == 0 && rtc[YEAR_INDEX] % 100 != 0) || (rtc[YEAR_INDEX] % 400 == 0)) {
+		                    days_in_month = 29;
+		                } else {
+		                    days_in_month = 28;
+		                }
+		                break;
+		            default:
+		                break;
+		        }
+				if(rtc[DATE_INDEX] == days_in_month) rtc[DATE_INDEX] = 1;
+				rtc[DATE_INDEX]++;
+				setTimer(250,2);
+			}
 		}
 		if(button_count[BUTTON_NEXT]) {
-			switchTimeAtIndex(DATE, 1);
-			currentSpecificationState = MONTH;
+			if(flag_timer[2]){
+				switchTimeAtIndex(DATE, 1);
+				currentSpecificationState = MONTH;
+				setTimer(250,2);
+			}
 		}
 		break;
 	case MONTH:
 		blinky(MONTH);
 		if(button_count[BUTTON_UP]) {
-			if(rtc[MONTH_INDEX] == 12) rtc[MONTH_INDEX] = 1;
-			rtc[MONTH_INDEX]++;
+			if(flag_timer[2]){
+				if(rtc[MONTH_INDEX] == 12) rtc[MONTH_INDEX] = 1;
+				rtc[MONTH_INDEX]++;
+				setTimer(250,2);
+			}
 		}
 		if(button_count[BUTTON_NEXT]) {
-			switchTimeAtIndex(MONTH, 1);
-			currentSpecificationState = YEAR;
+			if(flag_timer[2]){
+				switchTimeAtIndex(MONTH, 1);
+				currentSpecificationState = YEAR;
+				setTimer(250,2);
+			}
 		}
 		break;
 	case YEAR:
 		blinky(YEAR);
 		if(button_count[BUTTON_UP]) {
-			rtc[YEAR_INDEX]++;
+			if(flag_timer[2]){
+				rtc[YEAR_INDEX]++;
+				setTimer(250,2);
+			}
 		}
 		if(button_count[BUTTON_NEXT]) {
-			switchTimeAtIndex(YEAR, 1);
-			currentSpecificationState = SECOND;
+			if(flag_timer[2]){
+				switchTimeAtIndex(YEAR, 1);
+				currentSpecificationState = SECOND;
+				setTimer(250,2);
+			}
 		}
 		break;
 	default: break;
@@ -308,29 +351,51 @@ void fsm_rtc(){
 		currentStateClock = SHOW_CLOCK;
 		break;
 	case SHOW_CLOCK:
+		lcd_ShowStr(20, 30, "Show Clock !!!", WHITE, RED, 24, 0);
 		if(flag_timer[0]){
 			update_clock();
 			setTimer(1000, 0);
 		}
 		if(check_timer_clock(clock,timerClock)){
-			//lcd display reach the timer
+			if(flag_timer[1]){
+				lcd_ShowStr(0, 30, "Reach Timer Clock!!!", RED, BLUE, 24, 0);
+				setTimer(5000,1);
+			}
+		}else{
+			if(flag_timer[1]){
+				lcd_ShowStr(0, 30, "", RED, BLUE, 24, 0);
+				setTimer(5000,1);
+			}
 		}
 		showTime(clock);
 		if(button_count[BUTTON_CHANGE]) {
-			currentSpecificationState = SECOND;
-			currentStateClock = MODIFY_CLOCK;
+			if(flag_timer[2]){
+				currentSpecificationState = SECOND;
+				currentStateClock = MODIFY_CLOCK;
+				setTimer(250,2);
+			}
 		}
 		break;
 	case MODIFY_CLOCK:
+		lcd_ShowStr(20, 30, "Modify Clock !!!", RED, BLUE, 24, 0);
 		fsm_rtc_button_processing(clock);
-		if(button_count[BUTTON_CHANGE]) currentStateClock = TIMER_CLOCK;
+		if(button_count[BUTTON_CHANGE]) {
+			if(flag_timer[2]){
+				currentSpecificationState = SECOND;
+				currentStateClock = TIMER_CLOCK;
+				setTimer(250,2);
+			}
+		}
 		break;
 	case TIMER_CLOCK:
-		showTime(timerClock);
+		lcd_ShowStr(20, 30, "Set Timer Clock!!!", RED, BLUE, 24, 0);
 		fsm_rtc_button_processing(timerClock);
 		if(button_count[BUTTON_CHANGE]) {
-			currentSpecificationState = SECOND;
-			currentStateClock = SHOW_CLOCK;
+			if(flag_timer[2]){
+				currentSpecificationState = SECOND;
+				currentStateClock = SHOW_CLOCK;
+				setTimer(250,2);
+			}
 		}
 		break;
 	default: break;

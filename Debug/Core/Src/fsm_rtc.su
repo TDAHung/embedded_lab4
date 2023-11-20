@@ -7,4 +7,4 @@ fsm_rtc.c:179:6:showTime	48	static
 fsm_rtc.c:184:6:blinky	16	static
 fsm_rtc.c:193:5:check_timer_clock	16	static
 fsm_rtc.c:204:6:fsm_rtc_button_processing	24	static
-fsm_rtc.c:304:6:fsm_rtc	8	static
+fsm_rtc.c:347:6:fsm_rtc	24	static
